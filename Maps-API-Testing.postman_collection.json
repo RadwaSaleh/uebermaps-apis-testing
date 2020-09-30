@@ -1,0 +1,243 @@
+{
+	"info": {
+		"_postman_id": "49899f4e-4d3a-4289-93d0-c4853557dc20",
+		"name": "Maps-API-Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Berlin map",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1a154e40-6435-44ad-8f6a-d46e946cc23b",
+						"exec": [
+							"let jsonResponse;",
+							"",
+							"pm.test(\"Map is created and status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    jsonResponse = pm.response.json();",
+							"    pm.collectionVariables.set(\"berlinMapId\", jsonResponse.data.id);",
+							"    pm.collectionVariables.set(\"mapOwner\", jsonResponse.data.owner_id);",
+							"});",
+							"",
+							"pm.test(\"Map title is correct\", function () {",
+							"    const expectedTitle = `${pm.collectionVariables.get(\"berlinMapTitle\")} ${pm.collectionVariables.get(\"timestamp\")}`;",
+							"    pm.expect(jsonResponse.data.title).to.eql(expectedTitle);",
+							"});",
+							"",
+							"pm.test(\"Map description is correct\", function () {",
+							"    const expectedDescription = `${pm.collectionVariables.get(\"berlinMapDes\")} ${pm.collectionVariables.get(\"timestamp\")}`;",
+							"    pm.expect(jsonResponse.data.description).to.eql(expectedDescription);",
+							"});",
+							"",
+							"pm.test(\"Map visibility is correct\", function () {",
+							"    pm.expect(jsonResponse.data.visibility).to.eql(pm.collectionVariables.get(\"berlinMapVisibility\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "da472ec7-a70e-4e80-b579-0f2c4e804331",
+						"exec": [
+							"const jsonReqBody = JSON.parse(pm.request.body.raw);",
+							"",
+							"pm.collectionVariables.set(\"berlinMapVisibility\", jsonReqBody.visibility);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "key",
+							"value": "auth_token",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{auth_token}}",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "query",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"{{berlinMapTitle}} {{timestamp}}\",\n    \"description\": \"{{berlinMapDes}} {{timestamp}}\",\n    \"visibility\": \"PUBLIC\",\n    \"map_settings\": {\n        \"editor_access\": [\n            \"can_administer.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"visitor_access\": [\n            \"can_administer.map\",\n            \"can_administer.spots\",\n            \"can_administer.events\",\n            \"can_administer.comments\",\n            \"can_administer.attachments\",\n            \"can_administer.collaborators\"\n        ],\n        \"respotting_to_this_map\": true\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base-url}}/maps",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"maps"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Berlin map",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5e5122d3-e26f-47c6-9714-f0777e20c981",
+						"exec": [
+							"let jsonResponse;",
+							"",
+							"pm.test(\"Map is retrieved and status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    jsonResponse = pm.response.json();",
+							"    pm.collectionVariables.set(\"berlinMapId\", jsonResponse.data.id);",
+							"});",
+							"",
+							"pm.test(\"Map title is retrieved successfully\", function () {",
+							"    const expectedTitle = `${pm.collectionVariables.get(\"berlinMapTitle\")} ${pm.collectionVariables.get(\"timestamp\")}`;",
+							"    pm.expect(jsonResponse.data.title).to.eql(expectedTitle);",
+							"});",
+							"",
+							"pm.test(\"Map description is retrieved successfully\", function () {",
+							"    const expectedDescription = `${pm.collectionVariables.get(\"berlinMapDes\")} ${pm.collectionVariables.get(\"timestamp\")}`;",
+							"    pm.expect(jsonResponse.data.description).to.eql(expectedDescription);",
+							"});",
+							"",
+							"pm.test(\"Map visibility is retrieved successfully\", function () {",
+							"    pm.expect(jsonResponse.data.visibility).to.eql(pm.collectionVariables.get(\"berlinMapVisibility\"));",
+							"});",
+							"",
+							"pm.test(\"Map retrieved user must be the map owner\", function () {",
+							"    pm.expect(jsonResponse.data.user.id).to.eql(pm.collectionVariables.get('mapOwner'));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base-url}}/maps/21000",
+					"host": [
+						"{{base-url}}"
+					],
+					"path": [
+						"maps",
+						"21000"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "eb8f102d-bb3b-4079-a281-6bb5a5d40e4c",
+				"type": "text/javascript",
+				"exec": [
+					"const email = pm.environment.get(\"email\");",
+					"const password = pm.environment.get(\"password\");",
+					"",
+					"const authentication_request = {",
+					"    url: `https://uebermaps.com/api/v2/authentication?user%5Bemail%5D=${email}&user%5Bpassword%5D=${password}`,",
+					"    method: 'POST',",
+					"    headers: {",
+					"        \"content-type\": 'application/json'",
+					"    }",
+					"}",
+					"",
+					"pm.sendRequest(authentication_request,function (err, res){",
+					"    pm.environment.set(\"auth_token\", res.json().data.auth_token);",
+					"});",
+					"",
+					"const moment = require('moment');",
+					"pm.collectionVariables.set(\"timestamp\", moment().format(\"DD/MM/YYYY hh:mm\"));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "31accc31-467f-4871-824a-7b648b0ac762",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "741480b5-f8ca-4f6e-9069-69aaac373ba6",
+			"key": "timestamp",
+			"value": ""
+		},
+		{
+			"id": "d665c338-d70e-4272-b7d7-56870d5af6d0",
+			"key": "berlinMapDes",
+			"value": ""
+		},
+		{
+			"id": "e39b52a8-36e4-4b2d-b761-9557835bdc07",
+			"key": "berlinMapTitle",
+			"value": ""
+		},
+		{
+			"id": "7a0216be-7105-4fb6-aa71-b4d0211f79d8",
+			"key": "berlinMapVisibility",
+			"value": ""
+		},
+		{
+			"id": "84721ab2-2eaa-4347-a097-a0286533541a",
+			"key": "mapsOwner",
+			"value": ""
+		},
+		{
+			"id": "342016ea-61f4-437c-9d6a-8480e585045a",
+			"key": "userInfo",
+			"value": ""
+		},
+		{
+			"id": "8513b12c-02c5-49b0-b06f-97533a853ae8",
+			"key": "berlinMapId",
+			"value": ""
+		},
+		{
+			"id": "103f756a-c13d-44d9-a829-d098b50a9eda",
+			"key": "mapOwner",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
