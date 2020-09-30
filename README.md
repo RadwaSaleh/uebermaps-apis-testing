@@ -17,8 +17,8 @@ $ npm install -g newman
 
 ## Usage
 
-1- Clone this repo.
-2- Open Postman and import the collection json file.
+1. Clone this repo.
+1. Open Postman and import the collection json file.
 
 
 ## Contributing
